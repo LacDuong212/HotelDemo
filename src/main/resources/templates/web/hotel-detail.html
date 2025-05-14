@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Pistachio Hotel</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* HOTEL GALLERY STYLES - UPDATED */
+        .hotel-gallery {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 10px;
+            margin: 20px 0 30px;
+            height: 400px;
+        }
+
+        .gallery-main {
+            grid-row: span 1;
+            grid-column: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 400px;
+        }
+
+        .gallery-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-user {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .gallery-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .gallery-user-avatar i {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .gallery-grid {
+            grid-column: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: 400px;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Hotel Content */
+        .hotel-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Hotel Info */
+        .hotel-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .hotel-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .hotel-address {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .hotel-map img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Amenities */
+        .amenities-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .amenity-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        /* Safety Measures */
+        .safety-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .safety-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .safety-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        /* Room Types */
+        .room-types {
+            margin-bottom: 40px;
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .room-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-image {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .room-info {
+            padding: 15px;
+        }
+
+        .room-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hotel-content {
+                grid-template-columns: 1fr;
+            }
+
+            .room-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hotel-gallery {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 10px;
+            }
+
+            .gallery-main {
+                height: 300px;
+            }
+
+            .gallery-grid {
+                grid-column: 1;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 150px 150px;
+                height: auto;
+            }
+
+            .gallery-item {
+                height: 150px;
+            }
+
+            .room-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{web/fragments/header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <!-- Hotel Gallery - UPDATED to match the image -->
+        <div class="hotel-gallery">
+            <!-- Main large image on the left -->
+            <div class="gallery-main">
+                <img th:src="${hotel.image[0].imageUrl}" alt="Main Hotel Image">
+                <div class="gallery-user">
+                    <div class="gallery-user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span th:text="${hotel.manager.user.fullname}"></span>
+                </div>
+            </div>
+
+            <!-- Grid ảnh phụ -->
+            <div class="gallery-grid">
+                <div class="gallery-item" th:each="img, iterStat : ${hotel.image}"
+                     th:if="${iterStat.index > 0 and iterStat.index < 5}">
+                    <img th:src="${img.imageUrl}" alt="Hotel Image Grid">
+                </div>
+            </div>
+        </div>
+
+        <!-- Hotel Content -->
+        <div class="hotel-content">
+            <!-- Left Column - Hotel Info -->
+            <div class="hotel-info-column">
+                <h1 class="hotel-title" th:text="${hotel.name}"></h1>
+
+                <!-- Description -->
+                <div class="info-section">
+                    <h2 class="section-title">Mô tả</h2>
+                    <p class="hotel-description" th:text="${hotel.description}"></p>
+                </div>
+
+                <!-- Location -->
+                <div class="info-section">
+                    <h2 class="section-title">Vị trí</h2>
+                    <p class="hotel-address" th:text="${hotel.address}"></p>
+                </div>
+            </div>
+
+            <!-- Right Column - Amenities -->
+            <div class="amenities-column">
+                <!-- Available Amenities -->
+                <div class="info-section">
+                    <h2 class="section-title">Tiện nghi có sẵn</h2>
+                    <div class="amenities-list">
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <span>Internet không dây miễn phí</span>
+                        </div>
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-tv"></i>
+                            </div>
+                            <span>Tivi với Netflix</span>
+                        </div>
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            <span>Điều hòa</span>
+                        </div>
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <span>Nhà bếp</span>
+                        </div>
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-swimming-pool"></i>
+                            </div>
+                            <span>Bể bơi riêng hoặc Sân hiên</span>
+                        </div>
+                        <div class="amenity-item">
+                            <div class="amenity-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <span>Máy sấy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Measures -->
+                <div class="info-section">
+                    <h2 class="section-title">An toàn và Vệ sinh</h2>
+                    <div class="safety-list">
+                        <div class="safety-item">
+                            <div class="safety-icon">
+                                <i class="fas fa-broom"></i>
+                            </div>
+                            <span>Dọn dẹp hàng ngày</span>
+                        </div>
+                        <div class="safety-item">
+                            <div class="safety-icon">
+                                <i class="fas fa-fire-extinguisher"></i>
+                            </div>
+                            <span>Khu trường hợp Tình trạng</span>
+                        </div>
+                        <div class="safety-item">
+                            <div class="safety-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span>Bình chữa cháy</span>
+                        </div>
+                        <div class="safety-item">
+                            <div class="safety-icon">
+                                <i class="fas fa-first-aid"></i>
+                            </div>
+                            <span>Thiết bị phát hiện khói</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Room Types -->
+        <div class="room-types">
+            <h2 class="section-title">Các loại phòng</h2>
+            <div class="room-grid">
+                <!-- Lặp qua danh sách phòng -->
+                <a th:each="room : ${hotel.rooms}"
+                   th:href="@{/room-detail/{id}(id=${room.rid})} "
+                   class="room-card">
+                    <img th:src="${room.imageUrl[0]}" alt="Room Image" class="room-image">
+                    <div class="room-info">
+                        <h3 class="room-name" th:text="${room.roomName}"></h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{web/fragments/footer :: footer}"></div>
+</body>
+</html>

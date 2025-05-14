@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Danh sách đặt phòng</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Booking List Styles */
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* Tabs Navigation */
+        .booking-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 25px;
+        }
+
+        .tab-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            position: relative;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .tab-item.active {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #333;
+        }
+
+        /* Booking Item Styles */
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* This is the key CSS to hide non-active tabs */
+        .booking-status {
+            display: none;
+        }
+
+        .booking-status.active {
+            display: block;
+        }
+
+        .booking-item {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-image {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .booking-details {
+            flex: 1;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .booking-info {
+            flex: 1;
+        }
+
+        .booking-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .booking-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .booking-host {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .booking-action {
+            display: flex;
+            align-items: center;
+        }
+
+        .view-details-btn {
+            background-color: #666;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .view-details-btn:hover {
+            background-color: #555;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-status:has(.booking-item) .empty-message {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .booking-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .booking-action {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .booking-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{host/fragments/host-header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <h1 class="page-title">Danh sách đặt phòng</h1>
+
+        <!-- Booking Tabs -->
+        <div class="booking-tabs">
+            <div class="tab-item active" data-status="upcoming">Sắp tới</div>
+            <div class="tab-item" data-status="booked">Đã đặt</div>
+            <div class="tab-item" data-status="canceled">Hủy</div>
+        </div>
+
+        <!-- Booking List -->
+        <div class="booking-list">
+            <!-- Sắp tới -->
+            <div class="booking-status upcoming active">
+                <!-- Biến để theo dõi hiển thị -->
+                <div th:remove="tag" th:with="displayedUpcoming = false">
+                    <!-- Hiển thị danh sách đặt phòng sắp tới -->
+                    <div th:each="item : ${upcomingBookings}" class="booking-item" th:with="displayedUpcoming = true">
+                        <img th:src="@{${item.room.imageUrl[0]}}" alt="Phòng" class="booking-image">
+                        <div class="booking-details">
+                            <div class="booking-info">
+                                <h3 class="booking-title" th:text="${item.room.roomName}">Phòng</h3>
+                                <div class="booking-meta">
+                                    <div class="booking-date" th:text="'Ngày đến: ' + ${item.checkInDate}">Ngày đến</div>
+                                    <div class="booking-date" th:text="'Ngày đi: ' + ${item.checkOutDate}">Ngày đi</div>
+                                    <div class="booking-guests" th:text="'Khách: ' + ${item.customerName}">Khách</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông báo trống, sẽ tự động ẩn nếu có đặt phòng hiển thị -->
+                <div class="empty-message">
+                    Không có đặt phòng nào sắp tới
+                </div>
+            </div>
+
+            <!-- Đã đặt -->
+            <div class="booking-status booked">
+                <!-- Biến để theo dõi hiển thị -->
+                <div th:remove="tag" th:with="displayedConfirmed = false">
+                    <!-- Hiển thị danh sách đặt phòng đã xác nhận -->
+                    <div th:each="item : ${pastBookings}" class="booking-item" th:with="displayedConfirmed = true">
+                        <img th:src="@{${item.room.imageUrl[0]}}" alt="Phòng" class="booking-image">
+                        <div class="booking-details">
+                            <div class="booking-info">
+                                <h3 class="booking-title" th:text="${item.room.roomName}">Phòng</h3>
+                                <div class="booking-meta">
+                                    <div class="booking-date" th:text="'Ngày đến: ' + ${item.checkInDate}">Ngày đến</div>
+                                    <div class="booking-date" th:text="'Ngày đi: ' + ${item.checkOutDate}">Ngày đi</div>
+                                    <div class="booking-guests" th:text="'Khách: ' + ${item.customerName}">Khách</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông báo trống, sẽ tự động ẩn nếu có đặt phòng hiển thị -->
+                <div class="empty-message">
+                    Không có đặt phòng nào đã xác nhận
+                </div>
+            </div>
+
+            <!-- Hủy -->
+            <div class="booking-status canceled">
+                <!-- Biến để theo dõi hiển thị -->
+                <div th:remove="tag" th:with="displayedCancelled = false">
+                    <!-- Hiển thị danh sách đặt phòng đã hủy -->
+                    <div th:each="item : ${cancelledBookings}" th:if="${item.status == 'CANCELLED'}" class="booking-item" th:with="displayedCancelled = true">
+                        <img th:src="@{${item.room.imageUrl[0]}}" alt="Phòng" class="booking-image">
+                        <div class="booking-details">
+                            <div class="booking-info">
+                                <h3 class="booking-title" th:text="${item.room.roomName}">Phòng</h3>
+                                <div class="booking-meta">
+                                    <div class="booking-date" th:text="'Ngày đến: ' + ${item.checkInDate}">Ngày đến</div>
+                                    <div class="booking-date" th:text="'Ngày đi: ' + ${item.checkOutDate}">Ngày đi</div>
+                                    <div class="booking-guests" th:text="'Khách: ' + ${item.customerName}">Khách</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông báo trống, sẽ tự động ẩn nếu có đặt phòng hiển thị -->
+                <div class="empty-message">
+                    Không có đặt phòng nào bị hủy
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer Section -->
+<div th:replace="~{host/fragments/host-footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab-item');
+        const statusContainers = document.querySelectorAll('.booking-status');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Get status from data attribute
+                const status = this.getAttribute('data-status');
+
+                // Hide all status containers
+                statusContainers.forEach(container => {
+                    container.classList.remove('active');
+                });
+
+                // Show the selected status container
+                document.querySelector(`.booking-status.${status}`).classList.add('active');
+
+                console.log(`Switched to ${status} tab`);
+            });
+        });
+    });
+</script>
+</body>
+</html>

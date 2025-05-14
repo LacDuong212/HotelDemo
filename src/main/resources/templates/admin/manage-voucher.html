@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Quản lý mã giảm giá</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0066cc;
+        }
+
+        .btn-add {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        .btn-add i {
+            margin-right: 6px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #333;
+        }
+
+        /* Voucher List */
+        .voucher-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Voucher Item */
+        .voucher-item {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            padding: 15px;
+            align-items: center;
+        }
+
+        .voucher-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .discount-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #FFF9E6;
+            color: #FFB800;
+        }
+
+        .voucher-content {
+            flex: 1;
+        }
+
+        .voucher-code {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .voucher-dates {
+            display: flex;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .voucher-dates span {
+            margin-right: 15px;
+        }
+
+        .voucher-discount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .voucher-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-delete {
+            background-color: #f8f9fa;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0066cc;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .date-inputs {
+            display: flex;
+            gap: 15px;
+        }
+
+        .date-group {
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 30px;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 10px 30px;
+        }
+
+        .btn-cancel:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .alert-dismissible {
+            position: relative;
+            padding-right: 4rem;
+        }
+
+        .alert-dismissible .close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 15px;
+            color: inherit;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .voucher-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .voucher-icon {
+                margin-bottom: 10px;
+            }
+
+            .voucher-actions {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .date-inputs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{admin/fragments/admin-header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <!-- Success Message Alert -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible">
+            <button type="button" class="close" onclick="this.parentElement.style.display='none'">&times;</button>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">Quản lý mã giảm giá</h1>
+            <button class="btn-add" id="openModalBtn">
+                <i class="fas fa-plus"></i> Thêm mã
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="ongoing">Đang diễn ra</div>
+            <div class="tab" data-tab="expired">Đã diễn ra</div>
+        </div>
+
+        <!-- Voucher List - Ongoing (Valid Promotions) -->
+        <div class="voucher-list" id="ongoing-tab">
+            <!-- Loop through valid promotions -->
+            <div th:if="${#lists.isEmpty(validPromotions)}" class="empty-state">
+                <i class="fas fa-ticket-alt"></i>
+                <p>Không có mã giảm giá nào đang diễn ra.</p>
+            </div>
+
+            <div th:each="promotion : ${validPromotions}" class="voucher-item">
+                <div class="voucher-icon">
+                    <div class="discount-icon">
+                        <i class="fas fa-percentage fa-2x"></i>
+                    </div>
+                </div>
+                <div class="voucher-content">
+                    <div class="voucher-code" th:text="${promotion.code}">VOUCHER123</div>
+                    <div class="voucher-dates">
+                        <span th:text="'Từ ngày: ' + ${#temporals.format(promotion.startDate, 'dd/MM/yyyy')}">Từ ngày: 15/02/2025</span>
+                        <span th:text="'Đến ngày: ' + ${#temporals.format(promotion.endDate, 'dd/MM/yyyy')}">Đến ngày: 15/05/2025</span>
+                    </div>
+                    <div class="voucher-discount" th:text="${#numbers.formatDecimal(promotion.discount, 1, 0) + '%'}">100%</div>
+                </div>
+                <div class="voucher-actions">
+                    <a th:href="@{/admin/voucher/delete(id=${promotion.pid})}" class="btn btn-delete">Xóa</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voucher List - Expired -->
+        <div class="voucher-list" id="expired-tab" style="display: none;">
+            <!-- Loop through expired promotions -->
+            <div th:if="${#lists.isEmpty(expiredPromotions)}" class="empty-state">
+                <i class="fas fa-ticket-alt"></i>
+                <p>Không có mã giảm giá nào đã hết hạn.</p>
+            </div>
+
+            <div th:each="promotion : ${expiredPromotions}" class="voucher-item">
+                <div class="voucher-icon">
+                    <div class="discount-icon">
+                        <i class="fas fa-percentage fa-2x"></i>
+                    </div>
+                </div>
+                <div class="voucher-content">
+                    <div class="voucher-code" th:text="${promotion.code}">VOUCHER123</div>
+                    <div class="voucher-dates">
+                        <span th:text="'Từ ngày: ' + ${#temporals.format(promotion.startDate, 'yyyy/MM/dd')}">Từ ngày: 15/02/2025</span>
+                        <span th:text="'Đến ngày: ' + ${#temporals.format(promotion.endDate, 'yyyy/MM/dd')}">Đến ngày: 15/05/2025</span>
+                    </div>
+                    <div class="voucher-discount" th:text="${#numbers.formatDecimal(promotion.discount, 1, 0) + '%'}">100%</div>
+                </div>
+                <div class="voucher-actions">
+                    <a th:href="@{/admin/voucher/delete(id=${promotion.pid})}" class="btn btn-delete">Xóa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Discount Code Modal -->
+    <div class="modal-overlay" id="addDiscountModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Thêm mã giảm giá</h2>
+            </div>
+            <div class="modal-body">
+                <form id="addDiscountForm" th:action="@{/admin/voucher/add}" method="post" th:object="${newPromotion}">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="code" name="code" placeholder="Nhập mã giảm giá" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="description" name="description" placeholder="Mô tả (không bắt buộc)">
+                    </div>
+                    <div class="form-group">
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Nhập % giảm giá (VD: 50)" min="0" max="100" required>
+                    </div>
+                    <div class="date-inputs">
+                        <div class="date-group">
+                            <label class="form-label">Ngày bắt đầu</label>
+                            <input type="date" class="form-control" id="startDate" name="startDateSelector" required>
+                            <input type="hidden" id="startDateFull" name="startDate">
+                        </div>
+                        <div class="date-group">
+                            <label class="form-label">Ngày kết thúc</label>
+                            <input type="date" class="form-control" id="endDate" name="endDateSelector" required>
+                            <input type="hidden" id="endDateFull" name="endDate">
+                        </div>
+                    </div>
+                    <input type="hidden" name="status" value="true">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addDiscountBtn">Thêm</button>
+                <button type="button" class="btn btn-cancel" id="cancelBtn">Hủy</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{admin/fragments/admin-footer :: footer}"></div>
+
+<!-- JavaScript for tab switching and modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.voucher-list');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                // Show the selected tab content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId + '-tab').style.display = 'flex';
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('addDiscountModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const addDiscountBtn = document.getElementById('addDiscountBtn');
+        const addDiscountForm = document.getElementById('addDiscountForm');
+
+        // Set default dates
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Format for date input
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+        };
+
+        document.getElementById('startDate').value = formatDate(now);
+        document.getElementById('endDate').value = formatDate(tomorrow);
+
+        // Open modal
+        openModalBtn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+        });
+
+        // Close modal
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Set time to start of day for start date and end of day for end date
+        addDiscountBtn.addEventListener('click', function() {
+            const startDateSelector = document.getElementById('startDate');
+            const endDateSelector = document.getElementById('endDate');
+            const startDateInput = document.getElementById('startDateFull');
+            const endDateInput = document.getElementById('endDateFull');
+
+            startDateInput.value = startDateSelector.value;
+            endDateInput.value = endDateSelector.value;
+
+            addDiscountForm.submit();
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.display = 'none';
+            });
+        }, 5000);
+    });
+</script>
+</body>
+</html>

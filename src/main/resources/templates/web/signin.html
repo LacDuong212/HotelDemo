@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Đăng nhập</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .signin-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .signin-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .signin-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #333;
+            outline: none;
+        }
+
+        .continue-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .continue-btn:hover {
+            background-color: #555;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+
+        .signup-link a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid red;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .signin-card {
+                padding: 30px 20px;
+            }
+
+            .signin-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Include header fragment -->
+<div th:replace="~{web/fragments/header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <div class="signin-content">
+            <div class="signin-card">
+                <h1 class="signin-title">Đăng Nhập</h1>
+
+                <!-- Hiển thị lỗi -->
+                <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+                <form id="signinForm" th:action="@{/signin}" method="post">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" th:value="${param.email}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="continue-btn">Đăng Nhập</button>
+            </form>
+
+                <div class="signup-link">
+                    Chưa có tài khoản? <a th:href="@{/signup}">Đăng ký ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{web/fragments/footer :: footer}"></div>
+
+<script>
+    document.getElementById('signinForm').addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!email || !password) {
+            e.preventDefault();
+            alert('Vui lòng nhập đầy đủ email và mật khẩu');
+            return false;
+        }
+
+        // Kiểm tra định dạng email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            e.preventDefault();
+            alert('Email không hợp lệ');
+            return false;
+        }
+
+        return true;
+    });
+</script>
+
+</body>
+</html>

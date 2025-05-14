@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Header Fragment -->
+<header id="header" th:fragment="header">
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo -->
+                <div class="logo">
+                    <h1>HEYGOBI</h1>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="navigation">
+                    <ul class="nav-links">
+                        <li><a href="#" th:href="@{/admin/manage-hotels}"><i class="fas fa-hotel"></i> Quản lý khách sạn</a></li>
+                        <li><a href="#" th:href="@{/admin/manage-users}"><i class="fas fa-users-cog"></i> Quản lý người dùng</a></li>
+                        <li><a href="#" th:href="@{/admin/manage-voucher}"><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <div class="user-dropdown">
+                        <button class="btn-user" aria-label="User profile" id="userDropdownBtn">
+                            <!-- Show avatar if it exists, otherwise show default icon -->
+                            <img th:if="${session.avatar != null}"
+                                 th:src="@{/images/{imageUrl}(imageUrl=${session.avatar.imageUrl})}"
+                                 alt="User Avatar"
+                                 class="user-avatar">
+                            <i th:unless="${session.avatar != null}" class="fas fa-user-circle"></i>
+                        </button>
+                        <div class="dropdown-content" id="userDropdown">
+                            <a href="#" th:href="@{/account}"><i class="fas fa-user-cog"></i> Tài khoản</a>
+                            <a href="#" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* HEADER STYLES */
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Logo */
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation */
+        .navigation {
+            flex-grow: 1;
+            margin-left: 50px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-right: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            border-color: #333;
+            background-color: #333;
+            color: white;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .btn-user {
+            background: none;
+            border: none;
+            font-size: 20px;
+            margin-left: 15px;
+            cursor: pointer;
+            color: #333;
+            display: none;
+        }
+
+        .btn-user {
+            display: block;
+            font-size: 24px;
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #fff;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            z-index: 1;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-content i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .show {
+            display: block;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .navigation {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo h1 {
+                font-size: 24px;
+            }
+
+            .dropdown-content {
+                min-width: 160px;
+            }
+        }
+
+        /* Add this to your existing CSS in the header fragment */
+        .btn-user .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f5f5f5;
+        }
+
+        .btn-user {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.getElementById('userDropdownBtn');
+            const dropdownContent = document.getElementById('userDropdown');
+            const userDropdown = document.querySelector('.user-dropdown');
+
+            // Toggle dropdown when clicking the avatar
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userDropdown.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+
+            // Close dropdown when clicking on a dropdown item
+            const dropdownItems = dropdownContent.querySelectorAll('a');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    dropdownContent.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</header>
+
+</body>
+</html>

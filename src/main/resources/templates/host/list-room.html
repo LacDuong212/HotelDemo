@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Danh sách phòng</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Room Listing Page Styles */
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-left: 15px;
+        }
+
+        .room-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 15px;
+        }
+
+        .add-room-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .add-room-btn:hover {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        .add-room-btn i {
+            margin-right: 5px;
+        }
+
+        /* Room Grid Layout */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 15px;
+        }
+
+        .room-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Room Image Styling - Enhanced */
+        .room-image-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .room-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        /* Hiệu ứng hover cho ảnh */
+        .room-image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Overlay gradient */
+        .room-image-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .room-image-container:hover::after {
+            opacity: 1;
+        }
+
+        /* Cải thiện room tag */
+        .room-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Thêm indicator cho gallery (nếu có nhiều ảnh) */
+        .image-gallery-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+        }
+
+        .image-gallery-indicator i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+
+        .room-info {
+            padding: 15px;
+        }
+
+        .room-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .room-actions-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .room-action-btn {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .view-btn:hover {
+            background-color: #e5e5e5;
+        }
+
+        .edit-btn {
+            background-color: white;
+            color: #ff5a5f;
+            border-color: #ff5a5f;
+        }
+
+        .edit-btn:hover {
+            background-color: #ff5a5f;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .room-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .room-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{host/fragments/host-header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <h1 class="page-title">Danh sách phòng</h1>
+
+        <div class="room-actions">
+            <div></div>
+            <button class="add-room-btn">
+                <i class="fas fa-plus"></i> Thêm phòng
+            </button>
+        </div>
+
+        <div class="room-grid">
+            <!-- Lặp qua danh sách phòng từ model -->
+            <div th:each="roomDTO : ${rooms}" class="room-card" th:data-room-id="${roomDTO.rid}">
+                <!-- Hiển thị ảnh phòng đã cải thiện -->
+                <div class="room-image-container">
+                    <img th:src="@{{imageUrl}(imageUrl=${roomDTO.imageUrl.get(0)})}" alt="Hình ảnh phòng"/>
+                    <span class="room-tag" th:text="${roomDTO.roomName}">Room Name</span>
+                    <!-- Hiển thị số lượng ảnh nếu có nhiều hơn 1 ảnh -->
+                    <div class="image-gallery-indicator" th:if="${roomDTO.imageUrl.size() > 1}">
+                        <i class="fas fa-images"></i>
+                        <span th:text="${roomDTO.imageUrl.size()}">0</span>
+                    </div>
+                </div>
+                <div class="room-info">
+                    <div class="room-actions-container">
+                        <!-- Chỉnh sửa phòng -->
+                        <button class="room-action-btn view-btn" th:href="@{/host/room/edit/{id}(id=${roomDTO.rid})}">Chỉnh sửa</button>
+                        <!-- Xóa phòng -->
+                        <button class="room-action-btn edit-btn" th:onclick="'deleteRoom(' + ${roomDTO.rid} + ')'">Xóa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer Section -->
+<div th:replace="~{host/fragments/host-footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // JavaScript for room listing page functionality
+
+        // Add room button functionality
+        const addRoomBtn = document.querySelector('.add-room-btn');
+        if (addRoomBtn) {
+            addRoomBtn.addEventListener('click', function () {
+                // Redirect to room creation page or open modal
+                window.location.href = '/host/add-room';
+            });
+        }
+
+        // Edit and delete button functionality
+        const editButtons = document.querySelectorAll('.view-btn');
+        const deleteButtons = document.querySelectorAll('.edit-btn');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const roomId = this.closest('.room-card').dataset.roomId;
+                window.location.href = `/host/room/edit/${roomId}`;
+            });
+        });
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const roomId = this.closest('.room-card').dataset.roomId;
+                if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
+                    deleteRoom(roomId);
+                }
+            });
+        });
+    });
+
+    // Hàm xóa phòng
+    function deleteRoom(roomId) {
+        // Gửi yêu cầu xóa phòng qua AJAX
+        console.log('Xóa phòng với ID:', roomId);
+
+        // Sử dụng Fetch API để gửi yêu cầu xóa
+        fetch(`/host/delete-room/${roomId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || ''
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Phòng đã được xóa thành công!');
+                    // Cập nhật giao diện người dùng sau khi xóa thành công
+                    const roomCard = document.querySelector(`.room-card[data-room-id="${roomId}"]`);
+                    if (roomCard) {
+                        roomCard.remove();
+                    } else {
+                        // Nếu không tìm thấy phần tử để xóa, làm mới trang
+                        location.reload();
+                    }
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Có lỗi xảy ra khi xóa phòng!'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi xóa phòng!');
+            });
+    }
+</script>
+</body>
+</html>

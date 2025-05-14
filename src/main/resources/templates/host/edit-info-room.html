@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa thông tin phòng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+        /* CSS Styles */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .edit-room-form {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .image-upload-area {
+            width: 100%;
+            height: 250px;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #aaa;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 3;
+            top: 0;
+            left: 0;
+            font-weight: 500;
+        }
+
+        .image-upload-area:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background-color: #f0f0f0;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .thumbnail:hover .thumbnail-overlay {
+            opacity: 1;
+        }
+
+        .thumbnail .btn-danger {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.2s;
+            z-index: 5;
+        }
+
+        .thumbnail:hover .btn-danger {
+            opacity: 1;
+        }
+
+        .empty-thumbnail {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            color: #aaa;
+        }
+
+        .empty-text {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .thumbnail.add {
+            background-color: #f8f9fa;
+            border: 2px dashed #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #aaa;
+        }
+
+        .add-text {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+        }
+
+        .btn-cancel {
+            background-color: #f1f1f1;
+            color: #333;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-submit {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .btn:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-images-label {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .all-images-section {
+            margin-top: 40px;
+        }
+
+        .all-images-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .image-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .modal-btn-cancel {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .modal-btn-confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .thumbnail-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .all-images-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{host/fragments/host-header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form id="roomForm" class="edit-room-form" th:action="@{/host/room/edit}" method="post" enctype="multipart/form-data">
+            <h1 class="form-title">Chỉnh sửa thông tin phòng</h1>
+            <input type="hidden" name="roomId" th:value="${room != null ? room.rid : ''}">
+
+            <div class="form-grid">
+                <div class="form-left">
+                    <h3 class="form-subtitle">Hình ảnh phòng</h3>
+
+                    <!-- Main image upload area -->
+                    <label for="mainImage" class="image-upload-area">
+                        <!-- Display current image if available -->
+                        <img th:if="${room != null && room.imageUrl != null && !room.imageUrl.isEmpty()}"
+                             th:src="@{{imageUrl}(imageUrl=${room.imageUrl.get(0)})}"
+                             th:alt="${room != null ? room.roomName : 'Room Image'}" class="main-image">
+                        <!-- Display default image if none available -->
+                        <img th:if="${room == null || room.imageUrl == null || room.imageUrl.isEmpty()}"
+                             th:src="@{/default.jpg}"
+                             alt="Ảnh mặc định" class="main-image">
+                        <i class="fas fa-camera upload-icon"></i>
+                        <div class="upload-overlay">Thay đổi ảnh chính</div>
+                    </label>
+                    <input type="file" id="mainImage" name="mainImage" class="file-input" accept="image/*">
+
+                    <div class="thumbnail-grid">
+                        <!-- Display existing thumbnails (max 3) -->
+                        <div th:each="imageUrl, status : ${room.imageUrl}"
+                             th:if="${status.index > 0 && status.index < 4}"
+                             class="thumbnail">
+                            <img th:src="@{{imageUrl}(imageUrl=${imageUrl})}"
+                                 th:alt="${room != null ? room.roomName : 'Room Image'} + ' - Ảnh ' + ${status.index}">
+                            <div class="thumbnail-overlay">Cập nhật</div>
+                            <button type="button" th:data-image-index="${status.index}" class="btn btn-danger remove-image-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <input type="file" th:id="'thumbnailImage' + ${status.index - 1}"
+                                   th:name="'thumbnailImage' + ${status.index - 1}"
+                                   class="file-input" accept="image/*">
+                        </div>
+
+                        <!-- Display empty thumbnails for new images -->
+                        <label th:if="${room.imageUrl == null || room.imageUrl.size() <= 1}"
+                               th:each="i : ${#numbers.sequence(1, 3 - (room.imageUrl != null && room.imageUrl.size() > 1 ? room.imageUrl.size() - 1 : 0))}"
+                               th:for="'extraImage' + ${i - 1}"
+                               class="thumbnail">
+                            <div class="empty-thumbnail">
+                                <i class="fas fa-image"></i>
+                                <div class="empty-text">Thêm ảnh</div>
+                            </div>
+                            <input type="file" th:id="'extraImage' + ${i - 1}"
+                                   th:name="'extraImage' + ${i - 1}"
+                                   class="file-input" accept="image/*">
+                        </label>
+
+                        <!-- Add additional images button -->
+                        <label for="additionalImages" class="thumbnail add">
+                            <i class="fas fa-plus"></i>
+                            <span class="add-text">Thêm ảnh</span>
+                        </label>
+                        <input type="file" id="additionalImages" name="additionalImages" class="file-input" accept="image/*" multiple>
+                    </div>
+
+                    <p class="room-images-label">Thêm hình ảnh chất lượng cao để thu hút khách đặt phòng</p>
+                </div>
+
+                <div class="form-right">
+                    <h3 class="form-subtitle">Thông tin cơ bản</h3>
+
+                    <div class="form-group">
+                        <label class="form-label" for="room-name">Tên phòng</label>
+                        <input type="text" id="room-name" name="roomName" class="form-input"
+                               th:value="${room != null ? room.roomName : ''}"
+                               placeholder="Nhập tên phòng" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="room-price">Giá phòng</label>
+                        <input type="text" id="room-price" name="roomPrice" class="form-input"
+                               th:value="${room != null && room.price != null ? #numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') : ''}"
+                               placeholder="Nhập giá phòng" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="room-description">Mô tả</label>
+                        <textarea id="room-description" name="roomDescription" class="form-textarea"
+                                  th:text="${room != null && room.description != null ? room.description : ''}"
+                                  placeholder="Mô tả chi tiết về phòng, dịch vụ và tiện nghi..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <a th:href="@{/host/list-room}" class="btn btn-cancel">Quay lại</a>
+                        <button type="submit" class="btn btn-submit">Cập nhật thông tin</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All images section -->
+            <div class="all-images-section" th:if="${room != null && room.imageUrl != null && !room.imageUrl.isEmpty()}">
+                <h3 class="form-subtitle">Tất cả hình ảnh phòng</h3>
+                <div class="all-images-grid">
+                    <div th:each="imageUrl, status : ${room.imageUrl}" class="image-card">
+                        <img th:src="@{{imageUrl}(imageUrl=${imageUrl})}"
+                             th:alt="${room != null ? room.roomName : 'Room Image'}">
+                        <div class="image-overlay" th:text="${status.index == 0 ? 'Ảnh chính' : 'Ảnh ' + status.index}"></div>
+                        <!-- Don't allow deleting main image (index=0) -->
+                        <button th:if="${status.index > 0}" type="button"
+                                th:data-image-index="${status.index}"
+                                class="btn btn-danger remove-image-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Xác nhận xóa ảnh</h3>
+            <p>Bạn có chắc chắn muốn xóa ảnh này?</p>
+            <div class="modal-actions">
+                <button type="button" id="cancelDeleteBtn" class="modal-btn modal-btn-cancel">Hủy</button>
+                <a id="confirmDeleteBtn" href="#" class="modal-btn modal-btn-confirm">Xóa</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{host/fragments/host-footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle form submission with validation
+        const form = document.getElementById('roomForm');
+        form.addEventListener('submit', function(e) {
+            // Validate required fields
+            const roomName = document.getElementById('room-name').value.trim();
+            const roomPriceRaw = document.getElementById('room-price').value.trim();
+            const roomPrice = roomPriceRaw.replace(/\./g, '');
+
+            if (!roomName) {
+                e.preventDefault();
+                showNotification('Vui lòng nhập tên phòng', 'error');
+                return;
+            }
+
+            if (!roomPrice) {
+                e.preventDefault();
+                showNotification('Vui lòng nhập giá phòng', 'error');
+                return;
+            }
+
+            // Validate price format (allow commas and spaces)
+            const priceStr = roomPrice.replaceAll(',', '').replaceAll(' ', '');
+            if (isNaN(priceStr)) {
+                e.preventDefault();
+                showNotification('Giá phòng phải là số', 'error');
+                return;
+            }
+        });
+
+        // Format price input with comma separators
+        const priceInput = document.getElementById('room-price');
+        if (priceInput) {
+            priceInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters except commas
+                let value = this.value.replace(/[^\d,]/g, '');
+                // Remove existing commas
+                value = value.replace(/,/g, '');
+                // Format with commas
+                if (value.length > 0) {
+                    value = new Intl.NumberFormat('vi-VN').format(parseInt(value));
+                }
+                this.value = value;
+            });
+        }
+
+        // Handle alert messages auto-hide
+        const alertElements = document.querySelectorAll('.alert');
+        if (alertElements.length > 0) {
+            setTimeout(() => {
+                alertElements.forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 500);
+                });
+            }, 2000);
+        }
+
+        // Handle image confirmation modal
+        const confirmModal = document.getElementById('confirmModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let imageIndexToDelete = null;
+
+        // Setup remove image buttons
+        document.querySelectorAll('.remove-image-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                imageIndexToDelete = this.getAttribute('data-image-index');
+                // Set the delete link with the image index
+                confirmDeleteBtn.href = `/host/delete-image-room?id=${document.querySelector('input[name="roomId"]').value}&imageIndex=${imageIndexToDelete}`;
+                // Show modal
+                confirmModal.style.display = 'block';
+            });
+        });
+
+        // Handle cancel button
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', function() {
+                confirmModal.style.display = 'none';
+            });
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+            if (event.target === confirmModal) {
+                confirmModal.style.display = 'none';
+            }
+        });
+
+        // Add keyboard support (Esc to cancel)
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && confirmModal.style.display === 'block') {
+                confirmModal.style.display = 'none';
+            }
+        });
+
+        // Handle image preview before upload
+        function handleImageUpload(inputElement, previewElement) {
+            inputElement.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    // Validate image file
+                    if (!file.type.match('image.*')) {
+                        showNotification('Vui lòng chọn file hình ảnh hợp lệ', 'error');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Find or create img tag
+                        let img = previewElement.querySelector('img');
+
+                        if (img) {
+                            img.src = e.target.result;
+                        } else {
+                            // Create new image if needed
+                            img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'cover';
+
+                            // Remove old content (icon and text)
+                            const emptyContent = previewElement.querySelector('.empty-thumbnail');
+                            if (emptyContent) {
+                                previewElement.innerHTML = ''; // Clear all content
+                            }
+
+                            previewElement.appendChild(img);
+
+                            // Add thumbnail overlay for newly added images
+                            const overlay = document.createElement('div');
+                            overlay.className = 'thumbnail-overlay';
+                            overlay.textContent = 'Ảnh mới';
+                            previewElement.appendChild(overlay);
+                        }
+
+                        // Handle UI when image is added
+                        if (previewElement.classList.contains('image-upload-area')) {
+                            const icon = previewElement.querySelector('.upload-icon');
+                            if (icon) icon.style.opacity = '0';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Show notification for successful image selection
+                    showNotification('Đã chọn ảnh! Nhấn "Cập nhật thông tin" để lưu thay đổi.', 'success');
+                }
+            });
+        }
+
+        // Handle main image
+        const mainImageInput = document.getElementById('mainImage');
+        const mainImagePreview = document.querySelector('.image-upload-area');
+        if (mainImageInput && mainImagePreview) {
+            handleImageUpload(mainImageInput, mainImagePreview);
+
+            // Ensure clicking the image area triggers the file input
+            mainImagePreview.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn')) {
+                    mainImageInput.click();
+                }
+            });
+        }
+
+        // Handle thumbnails
+        const thumbnailInputs = document.querySelectorAll('.thumbnail .file-input');
+        thumbnailInputs.forEach(input => {
+            const thumbnail = input.closest('.thumbnail');
+            if (thumbnail) {
+                handleImageUpload(input, thumbnail);
+
+                // Ensure clicking the thumbnail triggers the file input
+                thumbnail.addEventListener('click', function(e) {
+                    // Don't trigger file input when clicking on buttons inside the thumbnail
+                    if (!e.target.closest('.btn') && !e.target.closest('.modal')) {
+                        input.click();
+                    }
+                });
+            }
+        });
+
+        // Handle empty thumbnail uploads
+        const extraImageInputs = document.querySelectorAll('[id^="extraImage"]');
+        extraImageInputs.forEach(input => {
+            const thumbnail = input.closest('.thumbnail');
+            if (thumbnail) {
+                handleImageUpload(input, thumbnail);
+            }
+        });
+
+        // Handle multiple image selection
+        const addImageInput = document.getElementById('additionalImages');
+        if (addImageInput) {
+            addImageInput.addEventListener('change', function() {
+                const fileCount = this.files.length;
+                if (fileCount > 0) {
+                    // Validate image files
+                    let allValid = true;
+                    for (let i = 0; i < this.files.length; i++) {
+                        if (!this.files[i].type.match('image.*')) {
+                            allValid = false;
+                            break;
+                        }
+                    }
+
+                    if (!allValid) {
+                        showNotification('Vui lòng chỉ chọn file hình ảnh hợp lệ', 'error');
+                        return;
+                    }
+
+                    const message = fileCount === 1
+                        ? 'Đã chọn 1 ảnh! Nhấn "Cập nhật thông tin" để lưu thay đổi.'
+                        : `Đã chọn ${fileCount} ảnh! Nhấn "Cập nhật thông tin" để lưu thay đổi.`;
+
+                    showNotification(message, 'success');
+                }
+            });
+        }
+
+        // Connect add thumbnail button with file input
+        const addThumbnailButton = document.querySelector('.thumbnail.add');
+        if (addThumbnailButton) {
+            addThumbnailButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default behavior
+                document.getElementById('additionalImages').click();
+            });
+        }
+
+        // Add hover effects for buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add animation for image cards when they're removed
+        document.querySelectorAll('.image-card .btn-danger').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Show confirmation modal instead of direct animation
+                imageIndexToDelete = this.getAttribute('data-image-index');
+                confirmDeleteBtn.href = `/host/delete-image-room?id=${document.querySelector('input[name="roomId"]').value}&imageIndex=${imageIndexToDelete}`;
+                confirmModal.style.display = 'block';
+            });
+        });
+
+        // Helper function to show notifications
+        function showNotification(message, type = 'success') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                document.body.removeChild(notification);
+            });
+
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = type === 'success' ? '#3498db' : '#e74c3c';
+            notification.style.color = 'white';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            notification.style.zIndex = '9999';
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 100);
+
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Handle price formatting on load
+        if (priceInput && priceInput.value) {
+            // Format existing price with commas
+            let value = priceInput.value.replace(/[^\d,]/g, '');
+            value = value.replace(/,/g, '');
+            if (value.length > 0) {
+                priceInput.value = new Intl.NumberFormat('vi-VN').format(parseInt(value));
+            }
+        }
+
+        // Function to validate images before uploading
+        function validateImages() {
+            const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+
+            // Get all file inputs
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+
+            for (const input of fileInputs) {
+                if (input.files && input.files.length > 0) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        const file = input.files[i];
+
+                        // Check file type
+                        if (!validTypes.includes(file.type)) {
+                            showNotification('Chỉ chấp nhận file JPG, PNG hoặc WEBP', 'error');
+                            return false;
+                        }
+
+                        // Check file size
+                        if (file.size > MAX_SIZE) {
+                            showNotification('Kích thước file phải nhỏ hơn 5MB', 'error');
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        // Add validation to form before submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!validateImages()) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Show loading state
+                const submitBtn = document.querySelector('.btn-submit');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                    submitBtn.style.opacity = '0.7';
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

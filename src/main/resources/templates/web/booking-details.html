@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Chi tiết đơn đặt</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Main Content */
+        main {
+            padding: 30px 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        /* Booking Details Card */
+        .booking-details-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .booking-header {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .booking-image {
+            width: 300px;
+            height: 180px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 30px;
+        }
+
+        .booking-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .booking-hotel {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .booking-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .booking-info-section {
+            margin-bottom: 20px;
+        }
+
+        .booking-info-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .booking-info-item {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .booking-status {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .booking-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            .booking-header {
+                flex-direction: column;
+            }
+
+            .booking-image {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .booking-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{web/fragments/header :: header}"></div>
+
+<!-- Main Content -->
+<main>
+    <div class="container">
+        <a href="/booking-history" th:href="@{/booking-history}" class="back-link">
+            &lt; Quay Lại
+        </a>
+
+        <h1 class="page-title">Chi tiết đơn đặt</h1>
+
+        <div class="booking-details-card">
+            <div class="booking-header">
+                <img th:src="${booking.room.imageUrl[0]}" alt="Premium Deluxe Twin" class="booking-image">
+
+                <div>
+                    <h2 class="booking-title" th:text="${booking.room.roomName}">Premium Deluxe Twin</h2>
+                    <p class="booking-hotel" th:text="${booking.room.hotel.name}">Pistachio Hotel</p>
+                </div>
+            </div>
+
+            <div class="booking-info-grid">
+                <div class="booking-info-section">
+                    <h3 class="booking-info-title">Chi tiết đơn đặt</h3>
+                    <p class="booking-info-item" th:text="'Ngày check-in: ' + ${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')}">Ngày check-in: 24/01/2025</p>
+                    <p class="booking-info-item" th:text="'Ngày check-out: ' + ${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')}">Ngày check-out: 26/01/2025</p>
+                </div>
+
+                <div class="booking-info-section">
+                    <h3 class="booking-info-title">Chi tiết hóa đơn</h3>
+                    <p class="booking-info-item" th:text="'Đơn giá: ' + ${booking.room.price} + ' VNĐ'">Đơn giá: 1.500.000 VNĐ</p>
+                </div>
+
+                <div class="booking-info-section">
+                    <h3 class="booking-info-title">Trạng thái</h3>
+                    <p class="booking-status" th:text="${booking.status}"></p>
+                </div>
+            </div>
+
+            <div class="booking-total" th:text="'Tổng tiền: ' + ${booking.totalPrice} + ' VNĐ'">
+                1.500.000 VNĐ
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{web/fragments/footer :: footer}"></div>
+</body>
+</html>

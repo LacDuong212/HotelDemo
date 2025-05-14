@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Khách sạn của bạn</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Hotel Info Container */
+        .hotel-info-container {
+            background-color: #fff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .hotel-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Image Section */
+        .image-section {
+            grid-column: 1;
+        }
+
+        .main-image-container {
+            background-color: #f0f0f0;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .main-image-container .view-all {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .main-image-container .view-all:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .main-image-container .view-all i {
+            margin-right: 6px;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .thumbnail:hover {
+            opacity: 0.8;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .view-more-thumbnails {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .view-more-thumbnails:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        /* Info Section */
+        .info-section {
+            grid-column: 2;
+        }
+
+        .hotel-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .hotel-location {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hotel-location i {
+            margin-right: 8px;
+            color: #888;
+        }
+
+        .hotel-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Actions */
+        .hotel-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-primary {
+            background-color: #666;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn-primary:hover {
+            background-color: #555;
+        }
+
+        /* Images Gallery Modal */
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .gallery-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gallery-content {
+            position: relative;
+            width: 80%;
+            max-width: 1000px;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+            z-index: 1010;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .gallery-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-main img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            z-index: 1005;
+        }
+
+        .gallery-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .gallery-prev {
+            left: 20px;
+        }
+
+        .gallery-next {
+            right: 20px;
+        }
+
+        .gallery-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .gallery-thumbnails {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 0;
+            overflow-x: auto;
+        }
+
+        .gallery-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .gallery-thumbnail.active {
+            opacity: 1;
+            border: 2px solid white;
+        }
+
+        .gallery-thumbnail:hover {
+            opacity: 1;
+        }
+
+        .gallery-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hotel-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .image-section,
+            .info-section {
+                grid-column: 1;
+            }
+
+            .main-image-container {
+                height: 250px;
+            }
+
+            .gallery-content {
+                width: 95%;
+                height: 90%;
+            }
+
+            .gallery-thumbnails {
+                height: 80px;
+            }
+
+            .gallery-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{host/fragments/host-header :: header}"></div>
+
+<!-- Main Content -->
+<main>
+    <div class="container">
+        <div class="hotel-info-container">
+            <h1 class="page-title">Khách sạn của bạn</h1>
+
+            <div class="hotel-content">
+                <!-- Image Section -->
+                <div class="image-section">
+                    <!-- Hiển thị hình ảnh chính (hình đầu tiên trong danh sách) -->
+                    <div class="main-image-container" th:if="${not #lists.isEmpty(imagesList)}"
+                         id="mainImageContainer"
+                         onclick="openGallery(0)">
+                        <img th:src="@{/images/{imageUrl}(imageUrl=${imagesList[0].imageUrl})}"
+                             th:alt="${hotel.name}" class="main-image"
+                             th:data-url="@{/images/{imageUrl}(imageUrl=${imagesList[0].imageUrl})}">
+                        <div class="view-all" th:if="${imagesList.size() > 1}">
+                            <i class="fas fa-images"></i>
+                            <span th:text="'Xem tất cả ' + ${imagesList.size()} + ' ảnh'">Xem tất cả ảnh</span>
+                        </div>
+                    </div>
+                    <!-- Hiển thị hình ảnh mặc định nếu không có hình nào -->
+                    <div class="main-image-container" th:if="${#lists.isEmpty(imagesList)}">
+                        <img th:src="@{/images/default.jpg}"
+                             th:alt="${hotel.name}" class="main-image">
+                    </div>
+
+                    <!-- Hiển thị các hình ảnh thu nhỏ (tối đa 4 cái) -->
+                    <div class="thumbnail-container" id="mainThumbnailContainer">
+                        <!-- Lặp qua danh sách hình ảnh -->
+                        <div class="thumbnail" th:each="image, status : ${imagesList}"
+                             th:if="${status.index < 4}"
+                             th:data-index="${status.index}"
+                             onclick="openGalleryByIndex(this)">
+                            <img th:src="@{/images/{imageUrl}(imageUrl=${image.imageUrl})}"
+                                 th:alt="${hotel.name + ' - Ảnh ' + (status.index + 1)}"
+                                 th:data-url="@{/images/{imageUrl}(imageUrl=${image.imageUrl})}">
+                        </div>
+
+                        <!-- Hiển thị nút xem thêm nếu có hơn 4 ảnh -->
+                        <div class="view-more-thumbnails" th:if="${imagesList != null && imagesList.size() > 4}"
+                             onclick="openGallery(0)">
+                            +<span th:text="${imagesList.size() - 4}"></span>
+                        </div>
+
+                        <!-- Hiển thị hình ảnh mặc định nếu không có đủ hình -->
+                        <div class="thumbnail default-thumbnail" th:if="${#lists.isEmpty(imagesList) or imagesList.size() < 4}"
+                             th:each="i : ${#numbers.sequence(1, 4 - (imagesList != null ? imagesList.size() : 0))}">
+                            <img th:src="@{/images/default.jpg}" th:alt="${hotel.name + ' - Ảnh mặc định'}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="info-section">
+                    <h2 class="hotel-name" th:text="${session.hotel.name}">Pistachio Hotel</h2>
+                    <p class="hotel-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${session.hotel.address != null ? session.hotel.address : 'Chưa có địa chỉ'}">Sapa, Lào Cai, Việt Nam</span>
+                    </p>
+                    <p class="hotel-description" th:text="${session.hotel.description != null ? session.hotel.description : 'Chưa có mô tả'}">
+                        Khách sạn Pistachio là một điểm đến lý tưởng cho những ai tìm kiếm sự thư giãn và
+                        tận hưởng kỳ nghỉ trong không gian sang trọng, yên tĩnh. Nằm ngay trung tâm
+                        thành phố, khách sạn cách các địa điểm du lịch nổi tiếng chỉ vài phút đi bộ, mang
+                        đến sự thuận tiện cho cả khách công tác lẫn du khách.
+                    </p>
+
+                    <div class="hotel-actions">
+                        <a th:href="@{/host/edit-info-hotel/{id}(id=${session.hotel.hid})}" class="btn btn-outline">Chỉnh sửa</a>
+                        <a th:href="@{/host/list-room}" class="btn btn-primary">Danh sách phòng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Gallery Modal -->
+<div id="galleryModal" class="gallery-modal">
+    <div class="gallery-close" onclick="closeGallery()">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="gallery-content">
+        <div class="gallery-main">
+            <div class="gallery-nav gallery-prev" onclick="changeImage(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <img id="galleryMainImage" src="" alt="Hình ảnh phóng to">
+            <div class="gallery-nav gallery-next" onclick="changeImage(1)">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="gallery-counter">
+                <span id="currentImageIndex">1</span>/<span id="totalImages">1</span>
+            </div>
+        </div>
+        <div class="gallery-thumbnails" id="galleryThumbnails">
+            <!-- Thumbnails will be generated here via JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Debug Info - Chỉ hiển thị trong môi trường phát triển -->
+<div th:if="${@environment.getActiveProfiles()[0] == 'dev'}" style="display:none" id="debugInfo">
+    <h4>Debug Info - Danh sách ảnh:</h4>
+    <div th:each="image, status : ${imagesList}" class="debug-image-item">
+        <p th:text="${status.index + ': ' + image.imageUrl}"></p>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<div th:replace="~{host/fragments/host-footer :: footer}"></div>
+
+<script th:inline="javascript">
+    // Khởi tạo mảng allImages từ dữ liệu Thymeleaf
+    /**
+     * Enhanced image loading script for HEYGOBI Hotel
+     * This provides three methods of loading images and includes better error handling
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Helper function to get application context path
+        function getContextPath() {
+            // Try from meta tag if available
+            const metaContextPath = document.querySelector('meta[name="context-path"]')?.getAttribute('content');
+            if (metaContextPath !== undefined) return metaContextPath;
+
+            // Try from any existing link on the page
+            const anyLink = document.querySelector('a[href^="/"]');
+            if (anyLink) {
+                const href = anyLink.getAttribute('href');
+                const firstSlashIndex = href.indexOf('/');
+                const secondSlashIndex = href.indexOf('/', firstSlashIndex + 1);
+                if (secondSlashIndex !== -1) {
+                    return href.substring(0, secondSlashIndex);
+                }
+            }
+
+            // Default to empty string (no context path)
+            return '';
+        }
+
+        // Helper function to construct a proper image URL
+        function buildImageUrl(path) {
+            const contextPath = getContextPath();
+
+            // If path already has domain, return as is
+            if (path.startsWith('http://') || path.startsWith('https://')) {
+                return path;
+            }
+
+            // Clean up path
+            let cleanPath = path.trim();
+            if (!cleanPath.startsWith('/')) {
+                cleanPath = '/' + cleanPath;
+            }
+
+            // If path doesn't have /images prefix but should
+            if (!cleanPath.startsWith('/images/') && !contextPath.endsWith('/images')) {
+                cleanPath = '/images' + cleanPath;
+            }
+
+            // Construct final URL
+            return contextPath + cleanPath;
+        }
+
+        // Helper function to test if an image exists
+        function testImageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() { resolve(true); };
+                img.onerror = function() { resolve(false); };
+                img.src = url;
+            });
+        }
+
+        // Helper function to log image loading attempts
+        function logImageAttempt(description, url, success) {
+            console.log(
+                `%c Image ${success ? 'LOADED' : 'FAILED'}: %c ${description} %c ${url}`,
+                `color: ${success ? 'green' : 'red'}; font-weight: bold;`,
+                'color: blue;',
+                'color: black;'
+            );
+        }
+
+        // Initialize gallery
+        async function initGallery() {
+            console.log('Initializing gallery...');
+            window.allImages = [];
+            let currentImageIndex = 0;
+            let foundWorkingImages = false;
+
+            // METHOD 1: Try to get images from debug info
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo) {
+                console.log('Found debug info, extracting image URLs...');
+                const debugImageItems = debugInfo.querySelectorAll('.debug-image-item');
+
+                // Process images from debug info
+                for (let i = 0; i < debugImageItems.length; i++) {
+                    const item = debugImageItems[i];
+                    const text = item.textContent.trim();
+                    // Extract URL part after the index and colon
+                    const relativeUrl = text.substring(text.indexOf(':') + 1).trim();
+
+                    // Try three different ways to construct the URL
+                    const urlVariations = [
+                        buildImageUrl(relativeUrl),
+                        buildImageUrl('/' + relativeUrl),
+                        window.location.origin + buildImageUrl(relativeUrl)
+                    ];
+
+                    // Test each URL variation
+                    let foundWorking = false;
+                    for (const url of urlVariations) {
+                        const exists = await testImageExists(url);
+                        logImageAttempt(`Debug image #${i}`, url, exists);
+
+                        if (exists) {
+                            // Add to our collection if image loads successfully
+                            window.allImages.push({
+                                src: url,
+                                alt: `Hotel Image ${i + 1}`,
+                                originalIndex: i
+                            });
+                            foundWorking = true;
+                            foundWorkingImages = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundWorking) {
+                        console.warn(`Could not load image: ${relativeUrl}`);
+                    }
+                }
+            }
+
+            // METHOD 2: Try to get images from DOM elements if debug method didn't work
+            if (!foundWorkingImages) {
+                console.log('Trying to extract images from DOM elements...');
+                const mainImage = document.querySelector('.main-image');
+                const allThumbnails = document.querySelectorAll('.thumbnail:not(.default-thumbnail) img');
+
+                // Try the main image
+                if (mainImage && !mainImage.src.includes('default.jpg')) {
+                    const exists = await testImageExists(mainImage.src);
+                    logImageAttempt('Main image', mainImage.src, exists);
+
+                    if (exists) {
+                        window.allImages.push({
+                            src: mainImage.src,
+                            alt: mainImage.alt || 'Hotel Main Image',
+                            originalIndex: 0
+                        });
+                        foundWorkingImages = true;
+                    }
+                }
+
+                // Try the thumbnails
+                for (let i = 0; i < allThumbnails.length; i++) {
+                    const img = allThumbnails[i];
+                    if (!img.src.includes('default.jpg')) {
+                        const exists = await testImageExists(img.src);
+                        logImageAttempt(`Thumbnail #${i}`, img.src, exists);
+
+                        // Check if this image is already in our array
+                        const isDuplicate = window.allImages.some(existingImg =>
+                            existingImg.src === img.src || existingImg.src.includes(img.src));
+
+                        if (exists && !isDuplicate) {
+                            window.allImages.push({
+                                src: img.src,
+                                alt: img.alt || `Hotel Image ${i + 1}`,
+                                originalIndex: i + 1
+                            });
+                            foundWorkingImages = true;
+                        }
+                    }
+                }
+            }
+
+            // METHOD 3: Generate test URLs based on possible patterns if nothing worked
+            if (!foundWorkingImages) {
+                console.log('No images found, testing common URL patterns...');
+                const contextPath = getContextPath();
+                const hotelId = document.querySelector('.hotel-actions a')?.href?.match(/\/(\d+)$/)?.[1];
+
+                if (hotelId) {
+                    // Test common naming patterns
+                    const testPatterns = [
+                        `/images/hotels/${hotelId}/main.jpg`,
+                        `/images/hotels/${hotelId}/1.jpg`,
+                        `/images/hotel_${hotelId}.jpg`,
+                        `/images/hotels/${hotelId}/thumbnail.jpg`
+                    ];
+
+                    for (let i = 0; i < testPatterns.length; i++) {
+                        const testUrl = contextPath + testPatterns[i];
+                        const exists = await testImageExists(testUrl);
+                        logImageAttempt(`Test pattern #${i}`, testUrl, exists);
+
+                        if (exists) {
+                            window.allImages.push({
+                                src: testUrl,
+                                alt: `Hotel Image ${i + 1}`,
+                                originalIndex: i
+                            });
+                            foundWorkingImages = true;
+                        }
+                    }
+                }
+            }
+
+            // If still no images found, add default
+            if (!foundWorkingImages) {
+                const defaultUrl = getContextPath() + '/images/default.jpg';
+                window.allImages.push({
+                    src: defaultUrl,
+                    alt: 'Default Hotel Image',
+                    originalIndex: 0
+                });
+                console.warn('No working images found, using default image');
+            }
+
+            console.log('Gallery initialized with', window.allImages.length, 'images');
+
+            // Add a debug floating panel with the working URLs
+            const viewAllText = document.querySelector('.view-all span')?.textContent;
+            const actualImagesCount = viewAllText?.match(/\d+/)?.[0] || 0;
+
+            if (window.allImages.length < parseInt(actualImagesCount) || !foundWorkingImages) {
+                showDebugPanel();
+            }
+
+            // Set up event handlers
+            setupGalleryEventHandlers();
+        }
+
+        // Create a debug panel to help troubleshoot
+        function showDebugPanel() {
+            const panel = document.createElement('div');
+            panel.style.position = 'fixed';
+            panel.style.bottom = '10px';
+            panel.style.right = '10px';
+            panel.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            panel.style.color = 'white';
+            panel.style.padding = '10px';
+            panel.style.borderRadius = '5px';
+            panel.style.zIndex = '9999';
+            panel.style.maxWidth = '400px';
+            panel.style.maxHeight = '300px';
+            panel.style.overflow = 'auto';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = 'Close';
+            closeBtn.style.padding = '5px';
+            closeBtn.style.marginBottom = '10px';
+            closeBtn.onclick = function() { panel.remove(); };
+
+            const title = document.createElement('h3');
+            title.textContent = 'Image Debug Info';
+            title.style.marginBottom = '10px';
+
+            const content = document.createElement('div');
+            content.innerHTML = `
+            <p>Found ${window.allImages.length} working images</p>
+            <p>Working URLs:</p>
+            <ul>
+                ${window.allImages.map(img => `
+                    <li style="margin-bottom:5px">
+                        <a href="${img.src}" target="_blank" style="color:#3498db">
+                            ${img.src}
+                        </a>
+                    </li>
+                `).join('')}
+            </ul>
+            <p style="margin-top:10px">Check console for more details</p>
+        `;
+
+            panel.appendChild(closeBtn);
+            panel.appendChild(title);
+            panel.appendChild(content);
+            document.body.appendChild(panel);
+        }
+
+        // Set up event handlers for gallery
+        function setupGalleryEventHandlers() {
+            // Gallery event handlers
+            window.openGallery = function(index) {
+                // Validate index
+                if (index < 0 || index >= window.allImages.length) {
+                    console.warn('Invalid index, setting to 0');
+                    index = 0;
+                }
+
+                currentImageIndex = index;
+                const modal = document.getElementById('galleryModal');
+                const mainImage = document.getElementById('galleryMainImage');
+                const currentIndexSpan = document.getElementById('currentImageIndex');
+                const totalImagesSpan = document.getElementById('totalImages');
+                const thumbnailsContainer = document.getElementById('galleryThumbnails');
+
+                // Display main image
+                mainImage.src = window.allImages[index].src;
+                mainImage.alt = window.allImages[index].alt;
+
+                // Update image counter
+                currentIndexSpan.textContent = index + 1;
+                totalImagesSpan.textContent = window.allImages.length;
+
+                // Create thumbnails for all images
+                thumbnailsContainer.innerHTML = '';
+                window.allImages.forEach((image, idx) => {
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'gallery-thumbnail';
+                    if (idx === index) {
+                        thumbnail.classList.add('active');
+                    }
+
+                    const img = document.createElement('img');
+                    img.src = image.src;
+                    img.alt = image.alt;
+
+                    thumbnail.appendChild(img);
+                    thumbnail.onclick = function() {
+                        window.openGallery(idx);
+                    };
+
+                    thumbnailsContainer.appendChild(thumbnail);
+                });
+
+                // Show modal
+                modal.classList.add('show');
+
+                // Prevent page scrolling when modal is open
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.closeGallery = function() {
+                const modal = document.getElementById('galleryModal');
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            };
+
+            window.changeImage = function(direction) {
+                let newIndex = currentImageIndex + direction;
+
+                // Handle reaching the end or beginning of the list
+                if (newIndex >= window.allImages.length) {
+                    newIndex = 0;
+                } else if (newIndex < 0) {
+                    newIndex = window.allImages.length - 1;
+                }
+
+                window.openGallery(newIndex);
+            };
+
+            window.openGalleryByIndex = function(element) {
+                const index = parseInt(element.getAttribute('data-index')) || 0;
+                window.openGallery(index);
+            };
+
+            // Close gallery when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('galleryModal');
+                if (event.target === modal) {
+                    window.closeGallery();
+                }
+            });
+
+            // Add keyboard arrow events for navigation
+            document.addEventListener('keydown', function(event) {
+                const modal = document.getElementById('galleryModal');
+                if (!modal.classList.contains('show')) return;
+
+                switch(event.key) {
+                    case 'ArrowLeft':
+                        window.changeImage(-1);
+                        break;
+                    case 'ArrowRight':
+                        window.changeImage(1);
+                        break;
+                    case 'Escape':
+                        window.closeGallery();
+                        break;
+                }
+            });
+        }
+
+        // Start the initialization
+        initGallery();
+    });
+
+    // Chạy khởi tạo khi trang đã load xong
+    document.addEventListener('DOMContentLoaded', function() {
+        initImagesFromDOM();
+    });
+</script>
+</body>
+</html>

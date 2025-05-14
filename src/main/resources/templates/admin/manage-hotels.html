@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Danh sách khách sạn</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px 0;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Hotel Grid */
+        .hotel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .hotel-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hotel-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .hotel-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .hotel-info {
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: white;
+        }
+
+        .hotel-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .hotel-location {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-delete {
+            display: block;
+            text-align: center;
+            padding: 8px 0;
+            background-color: white;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            border-radius: 50px;
+            width: 80px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-delete:hover {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0 20px;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-item {
+            background-color: white;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 10px;
+            color: #333;
+            text-decoration: none;
+            border-right: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .page-item:last-child .page-link {
+            border-right: none;
+        }
+
+        .page-item.active .page-link {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        .page-link:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+
+        .pagination-info {
+            text-align: center;
+            margin-top: 10px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn-cancel {
+            background-color: #f1f1f1;
+            color: #555;
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #e4e4e4;
+        }
+
+        .modal-btn-confirm {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            background-color: #ff3333;
+        }
+
+        /* Notification Modal Styles */
+        .notification-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .notification-content {
+            background-color: #ffffff;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 480px;
+            max-width: 90%;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .notification-icon {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .notification-icon i {
+            font-size: 52px;
+            color: #ff9800;
+            background-color: rgba(255, 152, 0, 0.1);
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .notification-message {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .notification-btn {
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .notification-btn:hover {
+            background-color: #3a7bc8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hotel-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hotel-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .notification-content,
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{admin/fragments/admin-header :: header}"></div>
+
+<!-- Main Content -->
+<main>
+    <div class="container">
+        <h1 class="page-title">Danh sách khách sạn</h1>
+
+        <div class="hotel-grid">
+            <!-- Loop through hotels -->
+            <div class="hotel-item" th:each="hotel : ${hotels}">
+                <div class="hotel-card">
+                    <img th:src="@{${hotel.firstImageUrl}}" th:alt="${hotel.name}" class="hotel-image">
+                    <div class="hotel-info">
+                        <h2 class="hotel-name" th:text="${hotel.name}">Tên khách sạn</h2>
+                        <p class="hotel-location" th:text="${hotel.address}">Địa chỉ</p>
+                    </div>
+                </div>
+                <a href="#" class="btn-delete" th:onclick="'confirmDelete(' + ${hotel.id} + ')'">Xóa</a>
+            </div>
+        </div>
+
+        <!-- Empty state message -->
+        <div th:if="${#lists.isEmpty(hotels)}" style="text-align: center; padding: 30px;">
+            <p>Không có khách sạn nào.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" th:if="${totalPages > 0}">
+            <ul class="pagination">
+                <!-- First and Previous buttons -->
+                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/admin/manage-hotels(page=0,size=${size})}"
+                       aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/admin/manage-hotels(page=${currentPage - 1},size=${size})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Page numbers -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, lastPage)}"
+                    th:if="${i &gt; currentPage - 3 and i &lt; currentPage + 3}"
+                    th:classappend="${i == currentPage ? 'active' : ''}">
+                    <a class="page-link"
+                       th:href="@{/admin/manage-hotels(page=${i},size=${size})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+
+                <!-- Next and Last buttons -->
+                <li class="page-item" th:classappend="${currentPage == lastPage ? 'disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/admin/manage-hotels(page=${currentPage + 1},size=${size})}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == lastPage ? 'disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/admin/manage-hotels(page=${lastPage},size=${size})}"
+                       aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Pagination info -->
+        <div class="pagination-info" th:if="${totalItems > 0}">
+            Hiển thị <span th:text="${currentPage * size + 1}"></span> đến
+            <span th:text="${(currentPage * size) + #lists.size(hotels)}"></span> của
+            <span th:text="${totalItems}"></span> khách sạn
+        </div>
+    </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <p style="font-size: 16px;">Bạn có chắc chắn muốn xóa khách sạn này?</p>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmDeleteBtn">Xác nhận</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal for Booking in Progress -->
+<div id="notificationModal" class="notification-modal">
+    <div class="notification-content">
+        <div class="notification-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="notification-title">Không thể xóa khách sạn</h3>
+        <p class="notification-message">Khách sạn này đang có khách hàng đặt phòng. Vui lòng đợi cho đến khi tất cả đặt phòng hoàn tất hoặc hủy các đặt phòng trước khi xóa.</p>
+        <button class="notification-btn" onclick="closeNotificationModal()">Đã hiểu</button>
+    </div>
+</div>
+
+<script>
+    // Modal handling
+    const deleteModal = document.getElementById("deleteModal");
+    const notificationModal = document.getElementById("notificationModal");
+    const confirmBtn = document.getElementById("confirmDeleteBtn");
+
+    function confirmDelete(hotelId) {
+        deleteModal.style.display = "block";
+
+        // Set the onclick handler with the hotel ID
+        confirmBtn.onclick = function() {
+            showCannotDeleteNotification();
+        };
+    }
+
+    function closeModal() {
+        deleteModal.style.display = "none";
+    }
+
+    function showCannotDeleteNotification() {
+        closeModal(); // Close the delete confirmation modal first
+        notificationModal.style.display = "block";
+    }
+
+    function closeNotificationModal() {
+        notificationModal.style.display = "none";
+    }
+
+    // Close the modals if clicked outside
+    window.onclick = function(event) {
+        if (event.target === deleteModal) {
+            closeModal();
+        }
+        if (event.target === notificationModal) {
+            closeNotificationModal();
+        }
+    };
+</script>
+
+<!-- Include footer fragment -->
+<div th:replace="~{admin/fragments/admin-footer :: footer}"></div>
+</body>
+</html>

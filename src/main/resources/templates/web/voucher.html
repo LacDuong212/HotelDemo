@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Mã giảm giá</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #333;
+        }
+
+        /* Voucher List */
+        .voucher-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Voucher Item */
+        .voucher-item {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .voucher-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .voucher-icon img {
+            width: 100%;
+            height: auto;
+        }
+
+        .voucher-content {
+            flex: 1;
+            padding: 15px;
+            border-right: 1px dashed #ddd;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .voucher-descripption {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .voucher-code {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .voucher-dates {
+            display: flex;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .voucher-discount {
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 5px;
+        }
+        /* Discount Icons */
+        .discount-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #FFF9E6;
+            color: #FFB800;
+        }
+
+        .discount-icon.red {
+            background-color: #FFEBEB;
+            color: #FF5252;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .voucher-item {
+                flex-direction: column;
+            }
+
+            .voucher-icon {
+                width: 100%;
+                height: 60px;
+                padding: 10px;
+            }
+
+            .voucher-content {
+                border-right: none;
+                border-bottom: 1px dashed #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="~{web/fragments/header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <h1 class="page-title">Mã giảm giá</h1>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="upcoming">Sắp tới</div>
+            <div class="tab" data-tab="ongoing">Đang diễn ra</div>
+        </div>
+
+        <!-- Voucher List - Upcoming -->
+        <div class="voucher-list" id="upcoming-tab">
+            <div th:each="promotion : ${promotionUpcoming}" class="voucher-item">
+                <div class="voucher-icon">
+                    <div class="discount-icon">
+                        <i class="fas fa-percentage fa-2x"></i>
+                    </div>
+                </div>
+                <div class="voucher-content">
+                    <div class="voucher-descripption" th:text="${promotion.description}">Voucher Code</div>
+                    <div class="voucher-code" th:text="'Code: ' + ${promotion.code}">Voucher Code</div>
+                    <div class="voucher-dates">
+                        <span>Từ ngày: <span th:text="${#temporals.format(promotion.startDate, 'dd/MM/yyyy')}" style="margin-right: 15px;">Start Date</span></span>
+                        <span class="mx-2" style="margin-right: 15px;">|</span>
+                        <span>Đến ngày: <span th:text="${#temporals.format(promotion.endDate, 'dd/MM/yyyy')}">End Date</span></span>
+                    </div>
+                    <div class="voucher-discount" th:text="${promotion.discount + '%'}">Discount</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voucher List - Ongoing -->
+        <div class="voucher-list" id="ongoing-tab" style="display: none;">
+            <div th:each="promotion : ${promotionOngoing}" class="voucher-item">
+                <div class="voucher-icon">
+                    <div class="discount-icon red">
+                        <i class="fas fa-tag fa-2x"></i>
+                    </div>
+                </div>
+                <div class="voucher-content">
+                    <div class="voucher-descripption" th:text="${promotion.description}">Voucher Code</div>
+                    <div class="voucher-code" th:text="'Code: ' + ${promotion.code}">Voucher Code</div>
+                    <div class="voucher-dates">
+                        <span>Từ ngày: <span th:text="${#temporals.format(promotion.startDate, 'dd/MM/yyyy')}" style="margin-right: 15px;">Start Date</span></span>
+                        <span class="mx-2" style="margin-right: 15px;">|</span>
+                        <span>Đến ngày: <span th:text="${#temporals.format(promotion.endDate, 'dd/MM/yyyy')}">End Date</span></span>
+                    </div>
+                    <div class="voucher-discount" th:text="${promotion.discount + '%'}">Discount</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{web/fragments/footer :: footer}"></div>
+
+<!-- JavaScript for tab switching -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.voucher-list');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                // Show the selected tab content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId + '-tab').style.display = 'flex';
+            });
+        });
+    });
+</script>
+</body>
+</html>

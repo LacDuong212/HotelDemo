@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEYGOBI - Hồ Sơ Cá Nhân</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Embedded CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Profile Layout */
+        .profile-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* Profile Sidebar */
+        .profile-sidebar {
+            flex: 0 0 250px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .profile-avatar {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .avatar-placeholder {
+            color: white;
+            font-size: 40px;
+        }
+
+        .profile-name {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .profile-info {
+            padding: 0 20px 20px;
+        }
+
+        .profile-info-item {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .profile-info-email, .profile-info-phone {
+            color: #666;
+        }
+
+        .profile-verification {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .verification-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .verification-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .verification-item i {
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        /* Profile Content */
+        .profile-content {
+            flex: 1;
+        }
+
+        .profile-header {
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .join-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+
+            .profile-sidebar {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Include header fragment -->
+<div th:replace="${session.user.role == 'MANAGER'} ?
+     ~{host/fragments/host-header :: header} :
+     (${session.user.role == 'CUSTOMER'} ?
+     ~{web/fragments/header :: header} :
+     ~{common/fragments/default-header :: header})">
+</div>
+
+<!-- MAIN CONTENT -->
+<main>
+    <div class="container">
+        <div class="profile-container">
+            <!-- Profile Sidebar -->
+            <div class="profile-sidebar">
+                <div class="profile-avatar">
+                    <div class="avatar-circle">
+                        <!-- Show avatar image if it exists, otherwise show placeholder icon -->
+                        <img th:if="${avatar != null}" th:src="@{/images/{imageUrl}(imageUrl=${avatar.imageUrl})}"
+                             alt="User Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        <i th:unless="${avatar != null}" class="fas fa-user avatar-placeholder"></i>
+                    </div>
+                    <input type="file" id="avatarInput" style="display: none;" accept="image/*">
+                    <h2 class="profile-name" th:text="${session.user.fullname}">John Doe</h2>
+                    <h2 class="profile-role" th:text="${session.user.role}">Host</h2>
+                </div>
+
+                <div class="profile-info">
+                    <div class="profile-info-item">
+                        <div class="profile-info-email" th:text="${session.user.email}">johndoe123@gmail.com</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-phone" th:text="${session.user.phoneNumber}">+84 987 654 321</div>
+                    </div>
+
+                    <div class="profile-verification">
+                        <h3 class="verification-title">Xác thực tài khoản</h3>
+                        <div class="verification-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Xác thực email</span>
+                        </div>
+                        <div class="verification-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Xác thực SĐT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <div class="profile-header">
+                    <h1 class="welcome-title" th:text="'Xin chào, ' + ${session.user.fullname}">Xin chào, John Doe</h1>
+                    <div class="join-date">Tham gia từ năm 2025</div>
+                    <a th:href="${session.user.role == 'MANAGER' ? '/host/edit-account' : '/customer/edit-account'}" class="edit-btn">Chỉnh sửa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include footer fragment -->
+<div th:replace="~{web/fragments/footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Any JavaScript functionality can be added here
+    });
+</script>
+</body>
+</html>
